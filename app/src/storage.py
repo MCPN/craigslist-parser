@@ -34,8 +34,8 @@ class Storage:
 
     def get(self, uuid: str) -> Tuple[str, str]:
         with self.conn.cursor() as cursor:
-            cursor.execute('SELECT query, region FROM test WHERE uuid = (%s)', (uuid,))
+            cursor.execute('SELECT query, region FROM test WHERE uuid = (%s) LIMIT 1', (uuid,))
             result = cursor.fetchall()
-            if len(result) != 1:
+            if not result:
                 raise StorageError
             return result[0]

@@ -1,4 +1,4 @@
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 
 from fastapi import FastAPI, HTTPException
 from requests.exceptions import Timeout
@@ -69,7 +69,7 @@ def stat(uuid: str, start: str, finish: str) -> dict:
 
 
 @app.get("/top")
-def top(uuid: str, amount: Optional[int] = 5, sort: Optional[str] = None) -> dict:
+def top(uuid: str, amount: Optional[int] = 5, sort: Optional[str] = None) -> Dict[str, List[str]]:
     """Gets top amount adverts with respect to sort
 
     :param uuid: registered uuid
