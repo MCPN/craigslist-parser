@@ -1,0 +1,5 @@
+uvicorn
+fastapi
+lxml
+requests
+psycopg2-binary

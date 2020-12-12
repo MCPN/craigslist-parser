@@ -1,0 +1,23 @@
+version: '2.4'
+
+services:
+  db:
+    image: postgres:latest
+    restart: on-failure
+    volumes:
+      - ./data/:/data/db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=postgres
+
+  app:
+    build: app
+    restart: on-failure
+    depends_on:
+      - db
+    ports:
+      - 8000:8000
+    volumes:
+      - ./app/src/:/app
+    pids_limit: 256
