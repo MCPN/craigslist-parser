@@ -4,6 +4,7 @@ from datetime import datetime
 from lxml import html
 from requests import Session
 
+
 XPATH_COUNT = "(//span[contains(concat(' ', @class, ' '), ' totalcount ')]/text())"
 XPATH_TIMESTAMPS = "(//time[contains(concat(' ', @class, ' '), ' result-date ')]/@datetime)"
 XPATH_URL = "(//a[contains(concat(' ', @class, ' '), ' result-title hdrlnk ')]/@href)"
@@ -19,7 +20,7 @@ class CraigslistSession:
     """Wrapper for requests.Session"""
     def __init__(self, query: str, region: str, sort: Optional[str] = None) -> None:
         self.session = Session()
-        self.session.params.update({'query': query, 'sort': sort if sort is not None else 'date'})
+        self.session.params.update({'query': query, 'sort': sort if sort is not None else 'date', 'timeout': '5'})
         self.url = f'https://{region}.craigslist.org/search/jjj'
 
     def parse(self, offset: Optional[int] = None) -> str:

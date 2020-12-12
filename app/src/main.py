@@ -1,6 +1,7 @@
 from typing import Dict, Optional
 
 from fastapi import FastAPI, HTTPException
+from requests.exceptions import Timeout
 
 from storage import Storage, StorageError
 from parse import get_adverts, get_top_adverts, DatetimeParseError
@@ -41,7 +42,7 @@ def get(uuid: str) -> Dict[str, str]:
         query, region = storage.get(uuid)
         return {'query': query, 'region': region}
     except StorageError:
-        raise HTTPException(status_code=400, detail=f'no query found by uuid {uuid}')
+        raise HTTPException(status_code=404, detail=f'no query found by uuid {uuid}')
 
 
 @app.get("/stat")
@@ -63,6 +64,8 @@ def stat(uuid: str, start: str, finish: str) -> dict:
         return {'counter': len(adverts), 'timestamps': adverts}
     except DatetimeParseError:
         raise HTTPException(status_code=400, detail='wrong format of start and/or finish')
+    except Timeout:
+        raise HTTPException(status_code=503, detail='unable to connect to craigslist')
 
 
 @app.get("/top")
@@ -86,5 +89,8 @@ def top(uuid: str, amount: Optional[int] = 5, sort: Optional[str] = None) -> dic
 
     got = get(uuid)
     query, region = got['query'], got['region']
-    adverts = get_top_adverts(query, region, amount, sort)
-    return {'adverts': adverts}
+    try:
+        adverts = get_top_adverts(query, region, amount, sort)
+        return {'adverts': adverts}
+    except Timeout:
+        raise HTTPException(status_code=503, detail='unable to connect to craigslist')
