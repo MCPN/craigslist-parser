@@ -1,7 +1,7 @@
 import pytest
 from datetime import datetime
 
-from main import add, get
+from storage import Storage, StorageError
 from parse import (
     get_total_count,
     get_timestamps,
@@ -10,18 +10,16 @@ from parse import (
 )
 
 
-def test_add_and_get():
-    response = add('dogs', 'moscow')
-    assert len(response) == 1
-    uuid = response['uuid']
-    response = get(uuid)
+def test_db():
+    s = Storage()
+    uuid = s.add('dogs', 'moscow')
+    response = s.get(uuid)
     assert len(response) == 2
-    assert response['query'] == 'dogs'
-    assert response['region'] == 'moscow'
+    assert response[0] == 'dogs'
+    assert response[1] == 'moscow'
 
-    response = get('1')
-    assert len(response) == 1
-    assert response['error'] == 'no query found by uuid 1'
+    with pytest.raises(StorageError):
+        s.get('1')
 
 
 files = [
