@@ -20,14 +20,14 @@ class CraigslistSession:
     """Wrapper for requests.Session"""
     def __init__(self, query: str, region: str, sort: Optional[str] = None) -> None:
         self.session = Session()
-        self.session.params.update({'query': query, 'sort': sort if sort is not None else 'date', 'timeout': '5'})
+        self.session.params.update({'query': query, 'sort': sort if sort is not None else 'date'})
         self.url = f'https://{region}.craigslist.org/search/jjj'
 
     def parse(self, offset: Optional[int] = None) -> str:
         params = {}
         if offset is not None:
             params['s'] = str(offset)
-        return self.session.get(self.url, params=params).text
+        return self.session.get(self.url, params=params, timeout=5).text
 
 
 def get_total_count(content: str) -> int:
@@ -41,7 +41,7 @@ def get_total_count(content: str) -> int:
 
 
 def get_timestamps(content: str, first: bool = False) -> List[str]:
-    """Returns the timestamps from page (if first is True, returns only the first one)"""
+    """Returns timestamps from page (if first is True, returns only the first one)"""
     tree = html.fromstring(content)
     if first:
         return tree.xpath(XPATH_TIMESTAMPS + '[1]')
@@ -50,7 +50,7 @@ def get_timestamps(content: str, first: bool = False) -> List[str]:
 
 
 def get_adverts_from_page(content: str, start: datetime, finish: datetime) -> List[str]:
-    """Returns the filtered by timestamps adverts"""
+    """Returns filtered by timestamps adverts"""
     return [ad for ad in get_timestamps(content) if start <= datetime.fromisoformat(ad) <= finish]
 
 
